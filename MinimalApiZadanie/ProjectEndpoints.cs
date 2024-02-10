@@ -46,8 +46,10 @@ public class ProjectEndpoints
 
     public void DeleteProject(WebApplication app)
     {
-        app.MapDelete("/project/{id}", async (string roleName, Guid id, MariaDbContext db) =>
+        app.MapDelete("/project/{id}", async ([FromBody]JsonElement data, Guid id, MariaDbContext db) =>
         {
+            string roleName = data.GetProperty("RoleName").GetString();
+            
             if (roleName == "Admin")
             {
                 var deleteProject = await db.Projects.FirstOrDefaultAsync(x => x.Id == id);
