@@ -93,4 +93,35 @@ public class ProjectEndpoints
             return Results.StatusCode(StatusCodes.Status401Unauthorized);
         });
     }
+
+    public void AssignUserToProject(WebApplication app)
+    {
+        app.MapPost("/project/assign", async ([FromBody] JsonElement data, MariaDbContext db) =>
+        {
+            string roleName = data.GetProperty("RoleName").GetString();
+            var projectId = Guid.Parse(data.GetProperty("ProjectId").GetString());
+            var userId = Guid.Parse(data.GetProperty("UserId").GetString());
+
+            if (roleName == "Admin")
+            {
+                if (projectId == null || userId == null)
+                    return Results.StatusCode(StatusCodes.Status400BadRequest);
+                
+                List<User> users = new List<User> { await db.Users.FirstOrDefaultAsync(x => x.Id == userId) };
+
+                var project = await db.Projects.FirstOrDefaultAsync(x => x.Id == projectId);
+
+                if (project == null)
+                    return Results.StatusCode(StatusCodes.Status404NotFound);
+                
+                project.Users = users;
+
+                await db.SaveChangesAsync();
+
+                return Results.StatusCode(StatusCodes.Status201Created);
+            }
+
+            return Results.StatusCode(StatusCodes.Status401Unauthorized);
+        }).RequireAuthorization("Admin");
+    }
 }

@@ -10,8 +10,8 @@ public class User
     public string UserName { set; get; }
     [Required]
     public string Hash { set; get; }
-    [Required]
-    public string Role { set; get; }
+
+    [Required] public string Role { set; get; } = "User";
     
     public List<Project> Projects { set; get; }
 }

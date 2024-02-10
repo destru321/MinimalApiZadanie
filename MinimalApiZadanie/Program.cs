@@ -1,6 +1,3 @@
-using System.Net.Sockets;
-using DataModels.DTOs;
-using DataModels.Models;
 using Microsoft.EntityFrameworkCore;
 using MinimalApiZadanie;
 
@@ -32,5 +29,6 @@ ProjectEndpoints.CreateProject(app);
 ProjectEndpoints.GetProjects(app);
 ProjectEndpoints.DeleteProject(app);
 ProjectEndpoints.UpdateProject(app);
+ProjectEndpoints.AssignUserToProject(app);
 
 app.Run();

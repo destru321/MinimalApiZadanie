@@ -31,7 +31,7 @@ public class UserEndpoints
     
     public void LoginUser(WebApplication app)
     {
-        app.MapPost("/user/login", async (UserDTO user, MariaDbContext db) =>
+        app.MapPost("/user/login", async (UserDTO user, MariaDbContext db, HttpContext context) =>
         {
             var LoginUser = await db.Users.FirstOrDefaultAsync(x => x.UserName == user.UserName);
             
@@ -44,12 +44,13 @@ public class UserEndpoints
             if (user.Password == null || user.Password == string.Empty || user.Password == " ")
                 return Results.StatusCode(StatusCodes.Status400BadRequest);
 
-            string Hash = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            var Hash = BCrypt.Net.BCrypt.Verify(user.Password, LoginUser.Hash);
+            Console.WriteLine(Hash);
 
-            if (LoginUser.Hash != Hash)
+            if (!Hash)
                 // Return JWT
                 return Results.StatusCode(StatusCodes.Status401Unauthorized);
-            
+
             return Results.StatusCode(StatusCodes.Status200OK);
         });
     }
